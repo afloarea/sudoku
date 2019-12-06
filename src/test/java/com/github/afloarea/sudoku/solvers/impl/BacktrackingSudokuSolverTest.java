@@ -6,6 +6,9 @@ import com.github.afloarea.sudoku.solvers.SudokuSolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import java.util.concurrent.TimeUnit;
 
 class BacktrackingSudokuSolverTest {
 
@@ -27,15 +30,43 @@ class BacktrackingSudokuSolverTest {
                 {0, 9, 0, 0, 0, 0, 4, 0, 0}
         };
 
-        final SudokuTable table = new SudokuTable();
+        final SudokuTable table = createSudoku(hardestSudoku);
+
+        Assertions.assertTrue(solver.solve(table));
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    @DisplayName("Test that an initial validation on the table is performed before potentially wasting lots of time trying to find solutions")
+    void testSanityCheck() {
+
+        final int[][] invalidTable = {
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 1, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
+
+        final SudokuTable sudoku = createSudoku(invalidTable);
+
+        Assertions.assertFalse(solver.solve(sudoku));
+    }
+
+    private SudokuTable createSudoku(int[][] table) {
+        final SudokuTable sudoku = new SudokuTable();
 
         for (int row = 0; row < 9; row++) {
             for (int column = 0; column < 9; column++) {
-                table.setTileValue(row, column, hardestSudoku[row][column]);
+                sudoku.setTileValue(row, column, table[row][column]);
             }
         }
 
-        Assertions.assertTrue(solver.solve(table));
+        return sudoku;
     }
 
 }

@@ -17,6 +17,9 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
     private final Set<Integer> visited = new HashSet<>();
 
     public boolean solve(SudokuTable sudoku) {
+        if (!isValid(sudoku)) {
+            return false;
+        }
         return fill(sudoku, 0, 0);
     }
 
@@ -33,16 +36,29 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
         boolean isValid = false;
         int value = MIN_VALUE;
         while (!isValid && value <= MAX_VALUE) {
-            isValid = validateNewValue(sudoku, row, column, value) && fill(sudoku, nextRow, nextColumn);
+            sudoku.setTileValue(row, column, value);
+            isValid = isValid(sudoku, row, column) && fill(sudoku, nextRow, nextColumn);
             value++;
         }
         if (!isValid) sudoku.freeTile(row, column);
         return isValid;
     }
 
-    private boolean validateNewValue(SudokuTable sudoku, int row, int column, int value) {
-        sudoku.setTileValue(row, column, value);
+    private boolean isValid(SudokuTable sudoku) {
+        for (int row = 0; row < HEIGHT; row++) {
+            for (int column = 0; column < WIDTH; column++) {
 
+                if (!sudoku.isTileFree(row, column) && !isValid(sudoku, row, column)) {
+                    return false;
+                }
+
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isValid(SudokuTable sudoku, int row, int column) {
         return validateVerticalConstraint(sudoku, column)
                 && validateHorizontalConstraint(sudoku, row)
                 && validateCellConstraint(sudoku, row, column);

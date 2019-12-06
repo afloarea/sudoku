@@ -43,4 +43,8 @@ public final class SudokuTable {
         return table[row][column];
     }
 
+    @Override
+    public String toString() {
+        return Arrays.deepToString(table);
+    }
 }

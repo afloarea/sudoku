@@ -23,6 +23,8 @@ public final class ProcessingView extends PApplet {
     private static final int BLACK              = Color.BLACK.getRGB();
     private static final int LIGHT_GREY         = Color.LIGHT_GRAY.getRGB();
     private static final int MEDIUM_GREY        = Color.GRAY.getRGB();
+    private static final int RED                = Color.RED.getRGB();
+    private static final int GREEN              = Color.GREEN.getRGB();
 
     private static final SudokuSolver solver = new BacktrackingSudokuSolver();
 
@@ -30,6 +32,8 @@ public final class ProcessingView extends PApplet {
 
     private int selectedRow = -1;
     private int selectedColumn = -1;
+
+    private Boolean solved = null;
 
     @Override
     public void settings() {
@@ -53,19 +57,21 @@ public final class ProcessingView extends PApplet {
         drawValues();
 
         drawButtons();
+        drawLabel();
     }
 
     @Override
     public void mouseClicked() {
         // check solve button pressed
-        if (mouseX >= 100 && mouseX <= 280 && mouseY >= 550 && mouseY <= 590) {
-            solver.solve(sudoku);
+        if (mouseX >= 30 && mouseX <= 210 && mouseY >= 550 && mouseY <= 590) {
+            solved = solver.solve(sudoku);
             return;
         }
 
         // check clear button pressed
-        if (mouseX >= 300 && mouseX <= 480 && mouseY >=550 && mouseY < 590) {
+        if (mouseX >= 390 && mouseX <= 570 && mouseY >=550 && mouseY < 590) {
             sudoku.clear();
+            solved = null;
             return;
         }
 
@@ -127,15 +133,36 @@ public final class ProcessingView extends PApplet {
 
     private void drawButtons() {
         fill(LIGHT_GREY);
-        rect(100, 550, BUTTON_WIDTH, BUTTON_HEIGHT);
+        rect(30, 550, BUTTON_WIDTH, BUTTON_HEIGHT);
         fill(BLACK);
-        text("Solve", 150, 580);
+        text("Solve", 80, 580);
         fill(WHITE);
 
         fill(LIGHT_GREY);
-        rect(300, 550, BUTTON_WIDTH, BUTTON_HEIGHT);
+        rect(390, 550, BUTTON_WIDTH, BUTTON_HEIGHT);
         fill(BLACK);
-        text("Clear", 350, 580);
+        text("Clear", 440, 580);
+        fill(WHITE);
+    }
+
+    private void drawLabel() {
+        if (solved == null) return;
+
+        final String text;
+        final int color;
+        final int x;
+        if (solved) {
+            text = "Success!";
+            color = GREEN;
+            x = 240;
+        } else {
+            text = "Failed!";
+            color = RED;
+            x = 250;
+        }
+
+        fill(color);
+        text(text, x, 580);
         fill(WHITE);
     }
 
