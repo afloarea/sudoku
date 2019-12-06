@@ -9,14 +9,23 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>sudoku-solver</name>
+    <description>A simple sudoku game solver</description>
+    <url>https://github.com/afloarea/sudoku</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
 
+        <!-- dependencies versions -->
+        <processing.version>3.3.7</processing.version>
+
+        <!-- test dependencies versions -->
         <junit.version>5.5.2</junit.version>
         <surefire.version>2.22.0</surefire.version>
 
+        <!-- packaging dependencies & plugins versions -->
         <boot.version>2.1.8.RELEASE</boot.version>
     </properties>
 
@@ -25,7 +34,7 @@
         <dependency>
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
-            <version>3.3.7</version>
+            <version>${processing.version}</version>
         </dependency>
 
         <dependency>
@@ -57,13 +66,12 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>
-                                com.github.afloarea.sudoku.view.ProcessingView
-                            </mainClass>
+                            <mainClass>com.github.afloarea.sudoku.view.ProcessingView</mainClass>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
