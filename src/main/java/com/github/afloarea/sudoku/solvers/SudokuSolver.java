@@ -1,13 +1,17 @@
 package com.github.afloarea.sudoku.solvers;
 
-public interface SudokuSolver {
-    int FREE_TILE   = 0;
-    int WIDTH       = 9;
-    int HEIGHT      = 9;
-    int CELL_HEIGHT = 3;
-    int CELL_WIDTH  = 3;
-    int MIN_VALUE   = 1;
-    int MAX_VALUE   = 9;
+import com.github.afloarea.sudoku.model.SudokuTable;
 
-    boolean solve(int[][] sudoku);
+/**
+ * A SudokuSolver is capable of solving a Sudoku game.
+ */
+public interface SudokuSolver {
+
+    /**
+     * Attempt to solve given Sudoku.
+     * @param sudoku the Sudoku to solve
+     * @return whether the Sudoku was solved successfully or not
+     */
+    boolean solve(SudokuTable sudoku);
+
 }

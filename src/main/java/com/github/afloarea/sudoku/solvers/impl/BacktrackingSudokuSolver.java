@@ -1,25 +1,32 @@
 package com.github.afloarea.sudoku.solvers.impl;
 
 
+import com.github.afloarea.sudoku.model.SudokuTable;
 import com.github.afloarea.sudoku.solvers.SudokuSolver;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.github.afloarea.sudoku.model.SudokuTable.*;
+
+/**
+ * Backtracking implementation of a sudoku solver.
+ * Can solve one Sudoku game at a time.
+ */
 public final class BacktrackingSudokuSolver implements SudokuSolver {
     private final Set<Integer> visited = new HashSet<>();
 
-    public boolean solve(int[][] sudoku) {
+    public boolean solve(SudokuTable sudoku) {
         return fill(sudoku, 0, 0);
     }
 
-    private boolean fill(int[][] sudoku, int row, int column) {
+    private boolean fill(SudokuTable sudoku, int row, int column) {
         if (row >= HEIGHT) return true;
 
         final int nextColumn = (column + 1) % WIDTH;
         final int nextRow = row + (column + 1) / WIDTH;
 
-        if (sudoku[row][column] != FREE_TILE) {
+        if (!sudoku.isTileFree(row, column)) {
             return fill(sudoku, nextRow, nextColumn);
         }
 
@@ -29,19 +36,19 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
             isValid = validateNewValue(sudoku, row, column, value) && fill(sudoku, nextRow, nextColumn);
             value++;
         }
-        if (!isValid) sudoku[row][column] = FREE_TILE;
+        if (!isValid) sudoku.freeTile(row, column);
         return isValid;
     }
 
-    private boolean validateNewValue(int[][] sudoku, int row, int column, int value) {
-        sudoku[row][column] = value;
+    private boolean validateNewValue(SudokuTable sudoku, int row, int column, int value) {
+        sudoku.setTileValue(row, column, value);
 
         return validateVerticalConstraint(sudoku, column)
                 && validateHorizontalConstraint(sudoku, row)
                 && validateCellConstraint(sudoku, row, column);
     }
 
-    private boolean validateHorizontalConstraint(int[][] sudoku, int row) {
+    private boolean validateHorizontalConstraint(SudokuTable sudoku, int row) {
         visited.clear();
         for (int columnIndex = 0; columnIndex < WIDTH; columnIndex++) {
             if (findDuplicate(sudoku, row, columnIndex)) return false;
@@ -50,7 +57,7 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
         return true;
     }
 
-    private boolean validateVerticalConstraint(int[][] sudoku, int column) {
+    private boolean validateVerticalConstraint(SudokuTable sudoku, int column) {
         visited.clear();
         for (int rowIndex = 0; rowIndex < HEIGHT; rowIndex++) {
             if (findDuplicate(sudoku, rowIndex, column)) return false;
@@ -59,7 +66,7 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
         return true;
     }
 
-    private boolean validateCellConstraint(int[][] sudoku, int row, int column) {
+    private boolean validateCellConstraint(SudokuTable sudoku, int row, int column) {
         visited.clear();
         final int startRow      = row / CELL_HEIGHT * CELL_HEIGHT;
         final int endRow        = startRow + CELL_HEIGHT;
@@ -75,15 +82,18 @@ public final class BacktrackingSudokuSolver implements SudokuSolver {
         return true;
     }
 
-    private boolean findDuplicate(int[][] sudoku, int row, int column) {
-        final int tileValue = sudoku[row][column];
-
-        if (tileValue != FREE_TILE) {
-            if (visited.contains(tileValue)) return true;
-            else visited.add(tileValue);
+    private boolean findDuplicate(SudokuTable sudoku, int row, int column) {
+        if (sudoku.isTileFree(row, column)) {
+            return false;
         }
 
-        return false;
+        final int tileValue = sudoku.getTileValue(row, column);
+        if (!visited.contains(tileValue)) {
+            visited.add(tileValue);
+            return false;
+        }
+
+        return true;
     }
 
 }

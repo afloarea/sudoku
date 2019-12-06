@@ -1,11 +1,11 @@
 package com.github.afloarea.sudoku.view;
 
+import com.github.afloarea.sudoku.model.SudokuTable;
 import com.github.afloarea.sudoku.solvers.SudokuSolver;
 import com.github.afloarea.sudoku.solvers.impl.BacktrackingSudokuSolver;
 import processing.core.PApplet;
 
 import java.awt.Color;
-import java.util.Arrays;
 
 public final class ProcessingView extends PApplet {
     private static final int VIEW_WIDTH     = 600;
@@ -26,18 +26,7 @@ public final class ProcessingView extends PApplet {
 
     private static final SudokuSolver solver = new BacktrackingSudokuSolver();
 
-    private final int[][] data =
-            {
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            };
+    private final SudokuTable sudoku = new SudokuTable();
 
     private int selectedRow = -1;
     private int selectedColumn = -1;
@@ -68,13 +57,16 @@ public final class ProcessingView extends PApplet {
 
     @Override
     public void mouseClicked() {
-        // check button pressed
+        // check solve button pressed
         if (mouseX >= 100 && mouseX <= 280 && mouseY >= 550 && mouseY <= 590) {
-            solver.solve(data);
-        } else if (mouseX >= 300 && mouseX <= 480 && mouseY >=550 && mouseY < 590) {
-            for (int[] row : data) {
-                Arrays.fill(row, 0);
-            }
+            solver.solve(sudoku);
+            return;
+        }
+
+        // check clear button pressed
+        if (mouseX >= 300 && mouseX <= 480 && mouseY >=550 && mouseY < 590) {
+            sudoku.clear();
+            return;
         }
 
         //check cell selected
@@ -92,9 +84,9 @@ public final class ProcessingView extends PApplet {
     @Override
     public void keyPressed() {
         if (selectedRow < 0 || selectedColumn < 0) return;
-        final int value = Character.getNumericValue(key);
-        if (value >= 0 && value <= 9) {
-            data[selectedRow][selectedColumn] = value;
+
+        if (Character.isDigit(key)) {
+            sudoku.setTileValue(selectedRow, selectedColumn, Character.getNumericValue(key));
         }
     }
 
@@ -108,7 +100,11 @@ public final class ProcessingView extends PApplet {
     private void drawValues() {
         for (int row = 0; row < 9; row++) {
             for (int column = 0; column < 9; column++) {
-                if (data[row][column] != 0) text(data[row][column], 50 + column * CELL_SIZE, 40 + row * CELL_SIZE);
+
+                if (sudoku.isTileFree(row, column)) {
+                    continue;
+                }
+                text(sudoku.getTileValue(row, column), 50 + column * CELL_SIZE, 40 + row * CELL_SIZE);
             }
         }
     }
